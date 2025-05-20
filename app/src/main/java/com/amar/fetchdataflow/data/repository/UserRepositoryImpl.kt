@@ -1,9 +1,7 @@
 package com.amar.fetchdataflow.data.repository
 
-import android.util.Log
 import com.amar.fetchdataflow.common.Result
 import com.amar.fetchdataflow.data.api.ApiService
-import com.amar.fetchdataflow.data.model.User
 import com.amar.fetchdataflow.data.model.UserData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

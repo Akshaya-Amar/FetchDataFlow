@@ -23,8 +23,6 @@ class MainActivity : AppCompatActivity() {
           super.onCreate(savedInstanceState)
           setContentView(R.layout.activity_main)
 
-          viewModel.getUsers()
-
           lifecycleScope.launch {
                repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModel.users.collectLatest { result ->
