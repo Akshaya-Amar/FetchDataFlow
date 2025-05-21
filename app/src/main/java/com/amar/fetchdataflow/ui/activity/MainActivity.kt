@@ -12,6 +12,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amar.fetchdataflow.common.Result
 import com.amar.fetchdataflow.data.model.User
+import com.amar.fetchdataflow.data.model.UserData
 import com.amar.fetchdataflow.databinding.ActivityMainBinding
 import com.amar.fetchdataflow.ui.adapter.UserAdapter
 import com.amar.fetchdataflow.ui.fragment.BottomSheetFragment
@@ -35,32 +36,35 @@ class MainActivity : AppCompatActivity() {
           super.onCreate(savedInstanceState)
           binding = ActivityMainBinding.inflate(layoutInflater)
           setContentView(binding.root)
+          setUpRecyclerView()
+          observeUserData()
+     }
 
-          binding.recyclerView.apply {
-               layoutManager = LinearLayoutManager(this@MainActivity)
-               adapter = userAdapter
-          }
-
+     private fun observeUserData() {
           lifecycleScope.launch {
                repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModel.users.collectLatest { result ->
-                         when (result) {
-                              is Result.Success -> {
-                                   displayData(result.data.users)
-                                   Log.d("check...", "onCreate: Success -> ${result.data}")
-                              }
-
-                              is Result.Failure -> {
-                                   showError(result.message)
-                                   Log.d("check...", "onCreate: Failure -> ${result.message}")
-                              }
-
-                              is Result.Loading -> {
-                                   showLoadingIndicator()
-                                   Log.d("check...", "onCreate: Loading")
-                              }
-                         }
+                         handleResult(result)
                     }
+               }
+          }
+     }
+
+     private fun handleResult(result: Result<UserData>) {
+          when (result) {
+               is Result.Success -> {
+                    displayData(result.data.users)
+                    Log.d("check...", "onCreate: Success -> ${result.data}")
+               }
+
+               is Result.Failure -> {
+                    showError(result.message)
+                    Log.d("check...", "onCreate: Failure -> ${result.message}")
+               }
+
+               is Result.Loading -> {
+                    showLoadingIndicator()
+                    Log.d("check...", "onCreate: Loading")
                }
           }
      }
@@ -85,6 +89,13 @@ class MainActivity : AppCompatActivity() {
           binding.recyclerView.isVisible = true
           users?.let {
                userAdapter.submitList(it)
+          }
+     }
+
+     private fun setUpRecyclerView() {
+          binding.recyclerView.apply {
+               layoutManager = LinearLayoutManager(this@MainActivity)
+               adapter = userAdapter
           }
      }
 

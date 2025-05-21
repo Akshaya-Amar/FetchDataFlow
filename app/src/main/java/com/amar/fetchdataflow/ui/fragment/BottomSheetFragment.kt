@@ -5,8 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import com.amar.fetchdataflow.data.model.Address
 import com.amar.fetchdataflow.data.model.User
-import com.amar.fetchdataflow.data.model.UserData
 import com.amar.fetchdataflow.databinding.BottomSheetUserItemBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
@@ -26,29 +26,38 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
           val userDetail: User? = arguments?.getParcelable(USER_DATA)
 
           userDetail?.let { user ->
-               val unknown = "Unknown"
-               val completeName = "Name: ${user.firstName ?: unknown} ${user.lastName ?: unknown}"
-               binding.nameText.text = completeName
+               binding.nameText.text = getCompleteName(user)
+               binding.userInfoText.text = getUserInfo(user)
+          }
+     }
 
-               val completeAddress = user.address?.let { address ->
-                    listOfNotNull(
-                         address.address,
-                         address.city,
-                         address.state,
-                         address.postalCode,
-                         address.country
-                    ).joinToString(", ").ifEmpty { unknown }
-               }
+     private fun getCompleteName(user: User): String {
+          val unknown = "Unknown"
+          return "Name: ${user.firstName ?: unknown} ${user.lastName ?: unknown}"
+     }
 
-               val userInfo = buildString {
-                    appendLine("Age: ${user.age ?: unknown}")
-                    appendLine("Gender: ${user.gender ?: unknown}")
-                    appendLine("Email: ${user.email ?: unknown}")
-                    appendLine("Phone Number: ${user.phone ?: unknown}")
-                    appendLine("Address: ${completeAddress ?: unknown}")
-               }
+     private fun getUserInfo(user: User): String {
+          val unknown = "Unknown"
+          val userAddress = getCompleteAddress(user.address)
+          return buildString {
+               appendLine("Age: ${user.age ?: unknown}")
+               appendLine("Gender: ${user.gender ?: unknown}")
+               appendLine("Email: ${user.email ?: unknown}")
+               appendLine("Phone Number: ${user.phone ?: unknown}")
+               appendLine("Address: ${userAddress ?: unknown}")
+          }
+     }
 
-               binding.userInfoText.text = userInfo
+     private fun getCompleteAddress(address: Address?): String? {
+          val unknown = "Unknown"
+          return address?.let {
+               listOfNotNull(
+                    it.address,
+                    it.city,
+                    it.state,
+                    it.postalCode,
+                    it.country
+               ).joinToString(", ").ifEmpty { unknown }
           }
      }
 
