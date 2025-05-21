@@ -1,5 +1,6 @@
 package com.amar.fetchdataflow.util
 
+import android.util.Log
 import com.amar.fetchdataflow.common.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -15,7 +16,9 @@ import java.util.concurrent.TimeoutException
 fun <T> safeApiCall(
      fetchData: suspend () -> Response<T>
 ): Flow<Result<T>> = flow {
+     Log.d("check...", "Before fetchData: ${Thread.currentThread().name}")
      val response = fetchData()
+     Log.d("check...", "Before fetchData: ${Thread.currentThread().name}")
      if (response.isSuccessful) {
           response.body()?.let {
                emit(Result.Success(it))

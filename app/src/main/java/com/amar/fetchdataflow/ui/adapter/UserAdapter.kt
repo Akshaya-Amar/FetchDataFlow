@@ -1,12 +1,15 @@
 package com.amar.fetchdataflow.ui.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil.ItemCallback
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.amar.fetchdataflow.R
 import com.amar.fetchdataflow.data.model.User
 import com.amar.fetchdataflow.databinding.UserItemBinding
+import com.bumptech.glide.Glide
 
 class UserAdapter(
      private val onItemClick: (User) -> Unit
@@ -37,10 +40,26 @@ class UserAdapter(
           binding.root
      ) {
           fun onBind(user: User, onItemClick: (User) -> Unit) {
-               binding.nameText.text = user.firstName
-               binding.root.setOnClickListener {
-                    onItemClick(user)
+               val unknown = "Unknown value"
+               with(binding) {
+                    setProfileImage(user.image, root.context)
+                    val completeName = "${user.firstName ?: unknown} ${user.lastName ?: unknown}"
+                    nameText.text = completeName
+                    emailText.text = user.email ?: unknown
+                    phoneText.text = user.phone ?: unknown
+                    root.setOnClickListener {
+                         onItemClick(user)
+                    }
                }
+          }
+
+          private fun setProfileImage(imageUrl: String?, context: Context) {
+               val profileImageUrl = imageUrl?.takeIf { it.isNotBlank() }
+               Glide.with(context)
+                    .load(profileImageUrl)
+                    .placeholder(R.drawable.ic_profile_default)
+                    .error(R.drawable.ic_profile_default)
+                    .into(binding.userProfileImage)
           }
      }
 }
