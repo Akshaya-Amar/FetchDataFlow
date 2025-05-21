@@ -13,13 +13,13 @@ import java.net.UnknownHostException
 import java.util.concurrent.TimeoutException
 
 fun <T> safeApiCall(
-     hitApi: suspend () -> Response<T>
+     fetchData: suspend () -> Response<T>
 ): Flow<Result<T>> = flow {
-     val response = hitApi()
+     val response = fetchData()
      if (response.isSuccessful) {
           response.body()?.let {
                emit(Result.Success(it))
-          } ?: emit(Result.Failure("Something went wrong"))
+          } ?: emit(Result.Failure("Data is empty"))
      } else {
           emit(Result.Failure(response.message().takeIf { it.isNotBlank() } ?: "Something went wrong"))
      }
