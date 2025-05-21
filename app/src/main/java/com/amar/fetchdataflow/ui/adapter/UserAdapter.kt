@@ -14,7 +14,6 @@ import com.bumptech.glide.Glide
 class UserAdapter(
      private val onItemClick: (User) -> Unit
 ) : ListAdapter<User, UserAdapter.UserViewHolder>(UserDiffCallback()) {
-
      class UserDiffCallback : ItemCallback<User>() {
           override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
                return oldItem.id == newItem.id
@@ -40,7 +39,7 @@ class UserAdapter(
           binding.root
      ) {
           fun onBind(user: User, onItemClick: (User) -> Unit) {
-               val unknown = "Unknown value"
+               val unknown = "Unknown"
                with(binding) {
                     setProfileImage(user.image, root.context)
                     val completeName = "${user.firstName ?: unknown} ${user.lastName ?: unknown}"

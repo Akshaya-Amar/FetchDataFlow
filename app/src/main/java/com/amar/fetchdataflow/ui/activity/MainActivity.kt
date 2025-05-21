@@ -14,6 +14,7 @@ import com.amar.fetchdataflow.common.Result
 import com.amar.fetchdataflow.data.model.User
 import com.amar.fetchdataflow.databinding.ActivityMainBinding
 import com.amar.fetchdataflow.ui.adapter.UserAdapter
+import com.amar.fetchdataflow.ui.fragment.BottomSheetFragment
 import com.amar.fetchdataflow.ui.viewmodel.UserViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,13 +27,12 @@ class MainActivity : AppCompatActivity() {
      private lateinit var binding: ActivityMainBinding
      private val userAdapter by lazy {
           UserAdapter { user ->
-               Toast.makeText(this, user.firstName, Toast.LENGTH_SHORT).show()
+               showBottomSheet(user)
           }
      }
 
      override fun onCreate(savedInstanceState: Bundle?) {
           super.onCreate(savedInstanceState)
-
           binding = ActivityMainBinding.inflate(layoutInflater)
           setContentView(binding.root)
 
@@ -86,5 +86,10 @@ class MainActivity : AppCompatActivity() {
           users?.let {
                userAdapter.submitList(it)
           }
+     }
+
+     private fun showBottomSheet(user: User) {
+          val bottomSheetFragment = BottomSheetFragment.newInstance(user)
+          bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
      }
 }

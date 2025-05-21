@@ -1,7 +1,10 @@
 package com.amar.fetchdataflow.data.model
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class User(
      @SerializedName("id") val id: Int? = null,
      @SerializedName("firstName") val firstName: String? = null,
@@ -31,4 +34,4 @@ data class User(
      @SerializedName("userAgent") val userAgent: String? = null,
      @SerializedName("crypto") val crypto: Crypto? = null,
      @SerializedName("role") val role: String? = null
-)
+) : Parcelable
