@@ -1,59 +1,16 @@
 package com.amar.fetchdataflow.data.repository
 
-import android.util.Log
 import com.amar.fetchdataflow.common.Result
 import com.amar.fetchdataflow.data.api.ApiService
 import com.amar.fetchdataflow.data.model.UserData
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import com.amar.fetchdataflow.util.safeApiCall
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.retryWhen
-import java.net.UnknownHostException
-import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
      private val apiService: ApiService
 ) : UserRepository {
-     override fun getUsers(): Flow<Result<UserData>> = flow {
-          val response = apiService.fetchUsers()
-          if (response.isSuccessful) {
-               val data = response.body()
-               data?.let {
-                    emit(Result.Success(it))
-               } ?: emit(Result.Failure("Something went wrong"))
-          } else {
-               emit(Result.Failure(response.message().takeIf { it.isNotBlank() } ?: "Something went wrong"))
-          }
-     }.retryWhen { cause, attempt ->
-          if (cause is UnknownHostException || cause is TimeoutException) {
-               if (attempt < 3) {
-                    delay(3000)
-                    true
-               } else false
-          } else {
-               false
-          }
-     }.catch { exception ->
-          Log.d("check...", "getUsers: $exception")
-          emit(Result.Failure(exception.message ?: "Something went wrong"))
-     }.flowOn(Dispatchers.IO)
+     override fun getUsers(): Flow<Result<UserData>> {
+          return safeApiCall { apiService.fetchUsers() }
+     }
 }
-
-/*
-Flow Emission:
-You initiate the flow by calling apiService.fetchUsers().
-If the network request fails (e.g., due to no internet connection), it throws an exception (e.g., UnknownHostException).
-
-Retry Block:
-The exception is caught by retry().
-The retry() operator checks if the exception is of a type you want to retry (e.g., UnknownHostException or TimeoutException).
-If the exception matches the retry condition, it retries the flow up to 3 times (or the number you set).
-
-Catch Block:
-If all retry attempts fail, the exception is then caught by the catch() block.
-In catch(), you handle the final failure by emitting a Result.Failure and logging the error.
-*/
