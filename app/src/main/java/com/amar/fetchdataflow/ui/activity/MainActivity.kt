@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-     private val viewModel: UserViewModel by viewModels()
+     private val viewModel by viewModels<UserViewModel>()
      private lateinit var binding: ActivityMainBinding
      private val userAdapter by lazy {
           UserAdapter { user ->
@@ -44,6 +44,7 @@ class MainActivity : AppCompatActivity() {
           lifecycleScope.launch {
                repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModel.users.collectLatest { result ->
+                         Log.d("check...", "observeUserData: $result")
                          handleResult(result)
                     }
                }
@@ -52,20 +53,11 @@ class MainActivity : AppCompatActivity() {
 
      private fun handleResult(result: Result<UserData>) {
           when (result) {
-               is Result.Success -> {
-                    displayData(result.data.users)
-                    Log.d("check...", "onCreate: Success -> ${result.data}")
-               }
+               is Result.Success -> { displayData(result.data.users) }
 
-               is Result.Failure -> {
-                    showError(result.message)
-                    Log.d("check...", "onCreate: Failure -> ${result.message}")
-               }
+               is Result.Failure -> { showError(result.message) }
 
-               is Result.Loading -> {
-                    showLoadingIndicator()
-                    Log.d("check...", "onCreate: Loading")
-               }
+               is Result.Loading -> { showLoadingIndicator() }
           }
      }
 
@@ -77,11 +69,11 @@ class MainActivity : AppCompatActivity() {
      private fun showError(message: String) {
           binding.progressBar.isVisible = false
           binding.recyclerView.isVisible = false
-          Snackbar.make(
-               binding.root,
-               message,
-               Snackbar.LENGTH_LONG
-          ).show()
+          Snackbar.make(binding.root, message, Snackbar.LENGTH_INDEFINITE)
+               .setAction("Retry") {
+                    viewModel.retry()
+               }
+               .show()
      }
 
      private fun displayData(users: List<User>?) {
